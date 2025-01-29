@@ -21,7 +21,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-set -e
+set -ex
 
 WD=$(dirname "$0")
 WD=$(cd "$WD"; pwd)
@@ -30,6 +30,14 @@ export FOR_BUILD_CONTAINER=1
 # shellcheck disable=SC1090,SC1091
 source "${WD}/setup_env.sh"
 
+OUTPUT_DIR=out
+mkdir -p ${OUTPUT_DIR}/certs
+for cn in 'GEICO ROOT SHA256 ROOT CA' 'GEICO SHA256 SUB CA 01' 'Zscaler Root CA'; do \
+    security find-certificate -p -c "$cn" > "${OUTPUT_DIR}/certs/$cn.crt"; \
+done
+
+docker build -t "${IMG}-geico" -f ${OUTPUT_DIR}/certs.DOCKERFILE --build-arg IMG="${IMG}" .
+IMG="${IMG}-geico"
 
 MOUNT_SOURCE="${MOUNT_SOURCE:-${PWD}}"
 MOUNT_DEST="${MOUNT_DEST:-/work}"

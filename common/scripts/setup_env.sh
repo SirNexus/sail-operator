@@ -148,7 +148,7 @@ fi
 add_KUBECONFIG_if_exists () {
   if [[ -f "$1" ]]; then
     local local_config
-    local_config="$(mktemp)"
+    local_config="$(mktemp --tmpdir=/tmp/colima)"
     cp "${1}" "${local_config}"
 
     kubeconfig_random="$(od -vAn -N4 -tx /dev/random | tr -d '[:space:]' | cut -c1-8)"
